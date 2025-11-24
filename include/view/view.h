@@ -37,6 +37,8 @@
 
 #include <view/view_overlay.h>
 
+class MIRROR_VIEW_MANAGER;
+
 namespace KIGFX
 {
 class PAINTER;
@@ -259,6 +261,27 @@ public:
     {
         return m_mirrorY;
     }
+
+    /**
+     * Set the mirror view manager for side-by-side mirror rendering.
+     * 
+     * @param aMirrorManager pointer to the mirror view manager, or nullptr to disable
+     */
+    void SetMirrorViewManager( MIRROR_VIEW_MANAGER* aMirrorManager );
+
+    /**
+     * Get the current mirror view manager.
+     * 
+     * @return pointer to mirror view manager, or nullptr if not set
+     */
+    MIRROR_VIEW_MANAGER* GetMirrorViewManager() const { return m_mirrorViewManager; }
+
+    /**
+     * Check if mirror view mode is currently active.
+     * 
+     * @return true if mirror view is enabled and active
+     */
+    bool IsMirrorViewActive() const;
 
     /**
      * Set the scaling factor, zooming around a given anchor point.
@@ -775,6 +798,12 @@ protected:
     /// Redraw contents within rectangle \a aRect.
     void redrawRect( const BOX2I& aRect );
 
+    /// Standard single view rendering
+    void redrawRectStandard( const BOX2I& aRect );
+
+    /// Split screen rendering with mirror view
+    void redrawRectWithMirrorView( const BOX2I& aRect );
+
     inline void markTargetClean( int aTarget )
     {
         wxCHECK( aTarget < TARGETS_NUMBER, /* void */ );
@@ -884,6 +913,9 @@ protected:
     bool                               m_mirrorX;
     bool                               m_mirrorY;
 
+    /// Mirror view manager for side-by-side rendering
+    MIRROR_VIEW_MANAGER*               m_mirrorViewManager;
+
     /// PAINTER contains information how do draw items.
     PAINTER* m_painter;
 
@@ -903,4 +935,3 @@ protected:
     bool m_reverseDrawOrder;
 };
 } // namespace KIGFX
-

@@ -27,6 +27,7 @@
 #include <board_design_settings.h>
 #include <pgm_base.h>
 #include <pcb_edit_frame.h>
+#include <mirror_view_manager.h>
 #include <3d_viewer/eda_3d_viewer_frame.h>
 #include <api/api_plugin_manager.h>
 #include <geometry/geometry_utils.h>
@@ -199,7 +200,8 @@ PCB_EDIT_FRAME::PCB_EDIT_FRAME( KIWAY* aKiway, wxWindow* aParent ) :
     m_boardSetupDlg( nullptr ),
     m_designBlocksPane( nullptr ),
     m_importProperties( nullptr ),
-    m_eventCounterTimer( nullptr )
+    m_eventCounterTimer( nullptr ),
+    m_mirrorViewManager( std::make_unique<MIRROR_VIEW_MANAGER>() )
 {
     m_maximizeByDefault = true;
     m_showBorderAndTitleBlock = true;   // true to display sheet references
@@ -235,6 +237,12 @@ PCB_EDIT_FRAME::PCB_EDIT_FRAME( KIWAY* aKiway, wxWindow* aParent ) :
 
     SetCanvas( canvas );
     SetBoard( new BOARD() );
+
+    // Set up mirror view manager
+    if( GetCanvas() && GetCanvas()->GetView() )
+    {
+        GetCanvas()->GetView()->SetMirrorViewManager( m_mirrorViewManager.get() );
+    }
 
     wxIcon icon;
     wxIconBundle icon_bundle;
@@ -3250,4 +3258,41 @@ bool PCB_EDIT_FRAME::DoAutoSave()
     // flushing zone fills or router state) they can be added here before calling the
     // base class method.
     return EDA_BASE_FRAME::doAutoSave();
+}
+
+
+void PCB_EDIT_FRAME::ToggleMirrorView()
+{
+    if( m_mirrorViewManager )
+    {
+        bool currentState = m_mirrorViewManager->IsMirrorViewEnabled();
+        m_mirrorViewManager->SetMirrorViewEnabled( !currentState );
+        
+        // Force a refresh of the view
+        if( GetCanvas() )
+        {
+            GetCanvas()->Refresh();
+        }
+    }
+}
+
+
+bool PCB_EDIT_FRAME::IsMirrorViewEnabled() const
+{
+    return m_mirrorViewManager && m_mirrorViewManager->IsMirrorViewEnabled();
+}
+
+
+void PCB_EDIT_FRAME::SetMirrorViewEnabled( bool aEnabled )
+{
+    if( m_mirrorViewManager )
+    {
+        m_mirrorViewManager->SetMirrorViewEnabled( aEnabled );
+        
+        // Force a refresh of the view
+        if( GetCanvas() )
+        {
+            GetCanvas()->Refresh();
+        }
+    }
 }
