@@ -22,6 +22,7 @@
 
 #include <math/vector2d.h>
 #include <math/box2.h>
+#include <view/view.h>
 
 namespace KIGFX
 {
@@ -35,7 +36,7 @@ class VIEW;
  * This class handles the coordinate transformations and viewport management
  * needed to display a mirrored view alongside the original PCB view.
  */
-class MIRROR_VIEW_MANAGER
+class MIRROR_VIEW_MANAGER : public MIRROR_VIEW_INTERFACE
 {
 public:
     MIRROR_VIEW_MANAGER();
@@ -53,14 +54,14 @@ public:
      * 
      * @return true if mirror view is enabled
      */
-    bool IsMirrorViewEnabled() const { return m_mirrorViewEnabled; }
+    bool IsMirrorViewEnabled() const override { return m_mirrorViewEnabled; }
 
     /**
      * Set the screen size for viewport calculations.
      * 
      * @param aScreenSize the current screen size in pixels
      */
-    void SetScreenSize( const VECTOR2D& aScreenSize );
+    void SetScreenSize( const VECTOR2D& aScreenSize ) override;
 
     /**
      * Get the viewport for the original (right) view.
@@ -68,7 +69,7 @@ public:
      * @param aFullViewport the full screen viewport
      * @return viewport rectangle for the original view
      */
-    BOX2D GetOriginalViewport( const BOX2D& aFullViewport ) const;
+    BOX2D GetOriginalViewport( const BOX2D& aFullViewport ) const override;
 
     /**
      * Get the viewport for the mirror (left) view.
@@ -76,7 +77,7 @@ public:
      * @param aFullViewport the full screen viewport
      * @return viewport rectangle for the mirror view
      */
-    BOX2D GetMirrorViewport( const BOX2D& aFullViewport ) const;
+    BOX2D GetMirrorViewport( const BOX2D& aFullViewport ) const override;
 
     /**
      * Convert screen coordinates to determine which view they belong to.
@@ -112,14 +113,14 @@ public:
      * @param aGal the GAL object to configure
      * @param aBoardCenter center point for mirroring
      */
-    void SetupMirrorTransform( KIGFX::GAL* aGal, const VECTOR2D& aBoardCenter ) const;
+    void SetupMirrorTransform( KIGFX::GAL* aGal, const VECTOR2D& aBoardCenter ) const override;
 
     /**
      * Restore GAL transformation matrix after mirror view rendering.
      * 
      * @param aGal the GAL object to restore
      */
-    void RestoreTransform( KIGFX::GAL* aGal ) const;
+    void RestoreTransform( KIGFX::GAL* aGal ) const override;
 
     /**
      * Get the divider line position between the two views.

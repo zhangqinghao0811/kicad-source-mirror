@@ -241,7 +241,7 @@ PCB_EDIT_FRAME::PCB_EDIT_FRAME( KIWAY* aKiway, wxWindow* aParent ) :
     // Set up mirror view manager
     if( GetCanvas() && GetCanvas()->GetView() )
     {
-        GetCanvas()->GetView()->SetMirrorViewManager( m_mirrorViewManager.get() );
+        GetCanvas()->GetView()->SetMirrorViewInterface( m_mirrorViewManager.get() );
     }
 
     wxIcon icon;

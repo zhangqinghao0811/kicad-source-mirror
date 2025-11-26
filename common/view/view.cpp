@@ -46,9 +46,6 @@
 #include <wx/log.h>
 #endif
 
-// Forward declaration for mirror view manager
-class MIRROR_VIEW_MANAGER;
-
 namespace KIGFX {
 
 class VIEW;
@@ -244,7 +241,7 @@ VIEW::VIEW() :
     m_scale( 4.0 ),
     m_minScale( 0.2 ), m_maxScale( 50000.0 ),
     m_mirrorX( false ), m_mirrorY( false ),
-    m_mirrorViewManager( nullptr ),
+    m_mirrorViewInterface( nullptr ),
     m_painter( nullptr ),
     m_gal( nullptr ),
     m_useDrawPriority( false ),
@@ -1072,7 +1069,7 @@ void VIEW::redrawRectStandard( const BOX2I& aRect )
 
 void VIEW::redrawRectWithMirrorView( const BOX2I& aRect )
 {
-    if( !m_mirrorViewManager )
+    if( !m_mirrorViewInterface )
         return;
 
     // Get screen size for viewport calculations
@@ -1083,8 +1080,8 @@ void VIEW::redrawRectWithMirrorView( const BOX2I& aRect )
     VECTOR2D boardCenter = GetCenter();
     
     // Get viewports for both views
-    BOX2D originalViewport = m_mirrorViewManager->GetOriginalViewport( fullViewport );
-    BOX2D mirrorViewport = m_mirrorViewManager->GetMirrorViewport( fullViewport );
+    BOX2D originalViewport = m_mirrorViewInterface->GetOriginalViewport( fullViewport );
+    BOX2D mirrorViewport = m_mirrorViewInterface->GetMirrorViewport( fullViewport );
     
     for( VIEW_LAYER* l : m_orderedLayers )
     {
@@ -1103,7 +1100,7 @@ void VIEW::redrawRectWithMirrorView( const BOX2I& aRect )
             // TODO: Implement proper viewport clipping when GAL supports it
             
             // Render mirror view (left side) with transformation
-            m_mirrorViewManager->SetupMirrorTransform( m_gal, boardCenter );
+            m_mirrorViewInterface->SetupMirrorTransform( m_gal, boardCenter );
             
             DRAW_ITEM_VISITOR drawFuncMirror( this, l->id, m_useDrawPriority, m_reverseDrawOrder );
             l->items->Query( aRect, drawFuncMirror );
@@ -1112,7 +1109,7 @@ void VIEW::redrawRectWithMirrorView( const BOX2I& aRect )
                 drawFuncMirror.deferredDraw();
             
             // Restore transformation
-            m_mirrorViewManager->RestoreTransform( m_gal );
+            m_mirrorViewInterface->RestoreTransform( m_gal );
             
             // Render original view (right side) normally
             DRAW_ITEM_VISITOR drawFuncOriginal( this, l->id, m_useDrawPriority, m_reverseDrawOrder );
@@ -1830,15 +1827,15 @@ void VIEW::ShowPreview( bool aShow )
 }
 
 
-void VIEW::SetMirrorViewManager( MIRROR_VIEW_MANAGER* aMirrorManager )
+void VIEW::SetMirrorViewInterface( MIRROR_VIEW_INTERFACE* aMirrorInterface )
 {
-    m_mirrorViewManager = aMirrorManager;
+    m_mirrorViewInterface = aMirrorInterface;
     
-    if( m_mirrorViewManager && m_gal )
+    if( m_mirrorViewInterface && m_gal )
     {
-        // Update screen size in mirror view manager
+        // Update screen size in mirror view interface
         VECTOR2D screenSize = m_gal->GetScreenPixelSize();
-        m_mirrorViewManager->SetScreenSize( screenSize );
+        m_mirrorViewInterface->SetScreenSize( screenSize );
     }
     
     // Force redraw when mirror view state changes
@@ -1848,7 +1845,7 @@ void VIEW::SetMirrorViewManager( MIRROR_VIEW_MANAGER* aMirrorManager )
 
 bool VIEW::IsMirrorViewActive() const
 {
-    return m_mirrorViewManager && m_mirrorViewManager->IsMirrorViewEnabled();
+    return m_mirrorViewInterface && m_mirrorViewInterface->IsMirrorViewEnabled();
 }
 
 

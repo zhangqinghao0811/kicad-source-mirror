@@ -37,7 +37,23 @@
 
 #include <view/view_overlay.h>
 
-class MIRROR_VIEW_MANAGER;
+/**
+ * Abstract interface for mirror view functionality.
+ * This allows the VIEW class to support mirror rendering without
+ * depending on specific implementations.
+ */
+class MIRROR_VIEW_INTERFACE
+{
+public:
+    virtual ~MIRROR_VIEW_INTERFACE() = default;
+    
+    virtual bool IsMirrorViewEnabled() const = 0;
+    virtual BOX2D GetOriginalViewport( const BOX2D& aFullViewport ) const = 0;
+    virtual BOX2D GetMirrorViewport( const BOX2D& aFullViewport ) const = 0;
+    virtual void SetupMirrorTransform( GAL* aGal, const VECTOR2D& aBoardCenter ) const = 0;
+    virtual void RestoreTransform( GAL* aGal ) const = 0;
+    virtual void SetScreenSize( const VECTOR2D& aScreenSize ) = 0;
+};
 
 namespace KIGFX
 {
@@ -263,18 +279,18 @@ public:
     }
 
     /**
-     * Set the mirror view manager for side-by-side mirror rendering.
+     * Set the mirror view interface for side-by-side mirror rendering.
      * 
-     * @param aMirrorManager pointer to the mirror view manager, or nullptr to disable
+     * @param aMirrorInterface pointer to the mirror view interface, or nullptr to disable
      */
-    void SetMirrorViewManager( MIRROR_VIEW_MANAGER* aMirrorManager );
+    void SetMirrorViewInterface( MIRROR_VIEW_INTERFACE* aMirrorInterface );
 
     /**
-     * Get the current mirror view manager.
+     * Get the current mirror view interface.
      * 
-     * @return pointer to mirror view manager, or nullptr if not set
+     * @return pointer to mirror view interface, or nullptr if not set
      */
-    MIRROR_VIEW_MANAGER* GetMirrorViewManager() const { return m_mirrorViewManager; }
+    MIRROR_VIEW_INTERFACE* GetMirrorViewInterface() const { return m_mirrorViewInterface; }
 
     /**
      * Check if mirror view mode is currently active.
@@ -913,8 +929,8 @@ protected:
     bool                               m_mirrorX;
     bool                               m_mirrorY;
 
-    /// Mirror view manager for side-by-side rendering
-    MIRROR_VIEW_MANAGER*               m_mirrorViewManager;
+    /// Mirror view interface for side-by-side rendering
+    MIRROR_VIEW_INTERFACE*             m_mirrorViewInterface;
 
     /// PAINTER contains information how do draw items.
     PAINTER* m_painter;
