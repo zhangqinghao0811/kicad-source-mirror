@@ -115,34 +115,15 @@ void MIRROR_VIEW_MANAGER::SetupMirrorTransform( KIGFX::GAL* aGal,
     if( !aGal )
         return;
 
-    // Save current transformation matrix
-    m_savedTransform = aGal->GetTransformation();
+    // Save current GAL state
+    aGal->Save();
     m_transformCacheValid = true;
 
-    // Create mirror transformation matrix
-    // This mirrors around the board center in X direction
-    MATRIX3x3D mirrorMatrix;
-    mirrorMatrix.SetIdentity();
-    
+    // Apply mirror transformation
     // Translate to board center, mirror X, then translate back
-    MATRIX3x3D translateToOrigin;
-    translateToOrigin.SetIdentity();
-    translateToOrigin.SetTranslation( -aBoardCenter );
-    
-    MATRIX3x3D mirror;
-    mirror.SetIdentity();
-    mirror.m_data[0][0] = -1.0;  // Mirror X axis
-    
-    MATRIX3x3D translateBack;
-    translateBack.SetIdentity();
-    translateBack.SetTranslation( aBoardCenter );
-    
-    // Combine transformations: translateBack * mirror * translateToOrigin
-    mirrorMatrix = translateBack * mirror * translateToOrigin;
-    
-    // Apply the mirror transformation on top of existing transformation
-    MATRIX3x3D combinedTransform = mirrorMatrix * m_savedTransform;
-    aGal->SetTransformation( combinedTransform );
+    aGal->Translate( aBoardCenter );
+    aGal->Scale( VECTOR2D( -1.0, 1.0 ) );  // Mirror X axis
+    aGal->Translate( VECTOR2D( -aBoardCenter.x, -aBoardCenter.y ) );
 }
 
 
@@ -151,8 +132,8 @@ void MIRROR_VIEW_MANAGER::RestoreTransform( KIGFX::GAL* aGal ) const
     if( !aGal || !m_transformCacheValid )
         return;
 
-    // Restore the saved transformation matrix
-    aGal->SetTransformation( m_savedTransform );
+    // Restore the saved GAL state
+    aGal->Restore();
 }
 
 

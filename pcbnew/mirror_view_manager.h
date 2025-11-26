@@ -22,6 +22,7 @@
 
 #include <math/vector2d.h>
 #include <math/box2.h>
+#include <math/matrix3x3.h>
 #include <view/view.h>
 
 namespace KIGFX
@@ -133,9 +134,8 @@ private:
     bool m_mirrorViewEnabled;
     VECTOR2D m_screenSize;
     
-    // Cached transformation matrices
+    // Track if we have saved GAL state
     mutable bool m_transformCacheValid;
-    mutable MATRIX3x3D m_savedTransform;
 };
 
 #endif // MIRROR_VIEW_MANAGER_H
