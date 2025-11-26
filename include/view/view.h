@@ -50,8 +50,8 @@ public:
     virtual bool IsMirrorViewEnabled() const = 0;
     virtual BOX2D GetOriginalViewport( const BOX2D& aFullViewport ) const = 0;
     virtual BOX2D GetMirrorViewport( const BOX2D& aFullViewport ) const = 0;
-    virtual void SetupMirrorTransform( GAL* aGal, const VECTOR2D& aBoardCenter ) const = 0;
-    virtual void RestoreTransform( GAL* aGal ) const = 0;
+    virtual void SetupMirrorTransform( KIGFX::GAL* aGal, const VECTOR2D& aBoardCenter ) const = 0;
+    virtual void RestoreTransform( KIGFX::GAL* aGal ) const = 0;
     virtual void SetScreenSize( const VECTOR2D& aScreenSize ) = 0;
 };
 
