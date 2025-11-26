@@ -48,7 +48,7 @@ public:
      * 
      * @param aEnable true to enable mirror view, false to disable
      */
-    void SetMirrorViewEnabled( bool aEnable ) { m_mirrorViewEnabled = aEnable; }
+    void SetMirrorViewEnabled( bool aEnable ) override { m_mirrorViewEnabled = aEnable; }
 
     /**
      * Check if mirror view is currently enabled.

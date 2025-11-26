@@ -53,6 +53,7 @@ public:
     virtual ~MIRROR_VIEW_INTERFACE() = default;
     
     virtual bool IsMirrorViewEnabled() const = 0;
+    virtual void SetMirrorViewEnabled( bool aEnable ) = 0;
     virtual BOX2D GetOriginalViewport( const BOX2D& aFullViewport ) const = 0;
     virtual BOX2D GetMirrorViewport( const BOX2D& aFullViewport ) const = 0;
     virtual void SetupMirrorTransform( KIGFX::GAL* aGal, const VECTOR2D& aBoardCenter ) const = 0;
