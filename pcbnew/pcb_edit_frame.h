@@ -26,7 +26,9 @@
 #include <mail_type.h>
 #include <settings/app_settings.h>
 #include <variant>
+#include <memory>
 
+// Forward declarations
 class MIRROR_VIEW_INTERFACE;
 class MIRROR_VIEW_MANAGER;
 
@@ -875,7 +877,7 @@ private:
     wxTimer*     m_eventCounterTimer;
 
     // Mirror view support
-    std::unique_ptr<MIRROR_VIEW_MANAGER> m_mirrorViewManager;
+    std::unique_ptr<MIRROR_VIEW_INTERFACE> m_mirrorViewManager;
 
 #ifdef KICAD_IPC_API
     std::unique_ptr<API_HANDLER_PCB> m_apiHandler;
