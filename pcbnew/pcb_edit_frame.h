@@ -27,6 +27,7 @@
 #include <settings/app_settings.h>
 #include <variant>
 
+class MIRROR_VIEW_INTERFACE;
 class MIRROR_VIEW_MANAGER;
 
 class ACTION_PLUGIN;
