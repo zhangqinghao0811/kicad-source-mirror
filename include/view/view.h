@@ -37,6 +37,11 @@
 
 #include <view/view_overlay.h>
 
+namespace KIGFX
+{
+class GAL;
+}
+
 /**
  * Abstract interface for mirror view functionality.
  * This allows the VIEW class to support mirror rendering without
@@ -58,7 +63,6 @@ public:
 namespace KIGFX
 {
 class PAINTER;
-class GAL;
 class VIEW_ITEM;
 class VIEW_GROUP;
 class VIEW_RTREE;
