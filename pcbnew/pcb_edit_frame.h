@@ -26,6 +26,11 @@
 #include <mail_type.h>
 #include <settings/app_settings.h>
 #include <variant>
+#include <memory>
+
+// Forward declarations
+class MIRROR_VIEW_INTERFACE;
+class MIRROR_VIEW_MANAGER;
 
 class ACTION_PLUGIN;
 class PCB_SCREEN;
@@ -834,6 +839,11 @@ public:
     void StartCrossProbeFlash( const std::vector<BOARD_ITEM*>& aItems );
     void OnCrossProbeFlashTimer( wxTimerEvent& aEvent );
 
+    // Mirror view methods
+    void ToggleMirrorView();
+    bool IsMirrorViewEnabled() const;
+    void SetMirrorViewEnabled( bool aEnabled );
+
 private:
     friend struct PCB::IFACE;
     friend class APPEARANCE_CONTROLS;
@@ -865,6 +875,9 @@ private:
     BOX2D        m_lastNetnamesViewport;
 
     wxTimer*     m_eventCounterTimer;
+
+    // Mirror view support
+    std::unique_ptr<MIRROR_VIEW_INTERFACE> m_mirrorViewManager;
 
 #ifdef KICAD_IPC_API
     std::unique_ptr<API_HANDLER_PCB> m_apiHandler;

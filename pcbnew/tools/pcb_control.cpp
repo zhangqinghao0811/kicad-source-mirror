@@ -2576,12 +2576,82 @@ int PCB_CONTROL::PlaceStackup( const TOOL_EVENT& aEvent )
 
 
 int PCB_CONTROL::FlipPcbView( const TOOL_EVENT& aEvent )
+
+int PCB_CONTROL::ToggleMirrorView( const TOOL_EVENT& aEvent )
 {
-    view()->SetMirror( !view()->IsMirroredX(), false );
-    view()->RecacheAllItems();
-    m_frame->GetCanvas()->ForceRefresh();
-    m_frame->OnDisplayOptionsChanged();
+    PCB_EDIT_FRAME* frame = dynamic_cast<PCB_EDIT_FRAME*>( m_frame );
+    if( frame )
+    {
+        frame->ToggleMirrorView();
+    }
     return 0;
+}
+{
+
+int PCB_CONTROL::ToggleMirrorView( const TOOL_EVENT& aEvent )
+{
+    PCB_EDIT_FRAME* frame = dynamic_cast<PCB_EDIT_FRAME*>( m_frame );
+    if( frame )
+    {
+        frame->ToggleMirrorView();
+    }
+    return 0;
+}
+    view()->SetMirror( !view()->IsMirroredX(), false );
+
+int PCB_CONTROL::ToggleMirrorView( const TOOL_EVENT& aEvent )
+{
+    PCB_EDIT_FRAME* frame = dynamic_cast<PCB_EDIT_FRAME*>( m_frame );
+    if( frame )
+    {
+        frame->ToggleMirrorView();
+    }
+    return 0;
+}
+    view()->RecacheAllItems();
+
+int PCB_CONTROL::ToggleMirrorView( const TOOL_EVENT& aEvent )
+{
+    PCB_EDIT_FRAME* frame = dynamic_cast<PCB_EDIT_FRAME*>( m_frame );
+    if( frame )
+    {
+        frame->ToggleMirrorView();
+    }
+    return 0;
+}
+    m_frame->GetCanvas()->ForceRefresh();
+
+int PCB_CONTROL::ToggleMirrorView( const TOOL_EVENT& aEvent )
+{
+    PCB_EDIT_FRAME* frame = dynamic_cast<PCB_EDIT_FRAME*>( m_frame );
+    if( frame )
+    {
+        frame->ToggleMirrorView();
+    }
+    return 0;
+}
+    m_frame->OnDisplayOptionsChanged();
+
+int PCB_CONTROL::ToggleMirrorView( const TOOL_EVENT& aEvent )
+{
+    PCB_EDIT_FRAME* frame = dynamic_cast<PCB_EDIT_FRAME*>( m_frame );
+    if( frame )
+    {
+        frame->ToggleMirrorView();
+    }
+    return 0;
+}
+    return 0;
+
+int PCB_CONTROL::ToggleMirrorView( const TOOL_EVENT& aEvent )
+{
+    PCB_EDIT_FRAME* frame = dynamic_cast<PCB_EDIT_FRAME*>( m_frame );
+    if( frame )
+    {
+        frame->ToggleMirrorView();
+    }
+    return 0;
+}
 }
 
 
@@ -2696,6 +2766,7 @@ void PCB_CONTROL::setTransitions()
     Go( &PCB_CONTROL::NetColorModeCycle,     PCB_ACTIONS::netColorModeCycle.MakeEvent() );
     Go( &PCB_CONTROL::RatsnestModeCycle,     PCB_ACTIONS::ratsnestModeCycle.MakeEvent() );
     Go( &PCB_CONTROL::FlipPcbView,           PCB_ACTIONS::flipBoard.MakeEvent() );
+    Go( &PCB_CONTROL::ToggleMirrorView,      PCB_ACTIONS::toggleMirrorView.MakeEvent() );
     Go( &PCB_CONTROL::RehatchShapes,         PCB_ACTIONS::rehatchShapes.MakeEvent() );
 
     // Layer control

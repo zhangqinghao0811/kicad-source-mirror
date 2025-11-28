@@ -241,6 +241,7 @@ VIEW::VIEW() :
     m_scale( 4.0 ),
     m_minScale( 0.2 ), m_maxScale( 50000.0 ),
     m_mirrorX( false ), m_mirrorY( false ),
+    m_mirrorViewInterface( nullptr ),
     m_painter( nullptr ),
     m_gal( nullptr ),
     m_useDrawPriority( false ),
@@ -1009,6 +1010,22 @@ struct VIEW::DRAW_ITEM_VISITOR
 
 void VIEW::redrawRect( const BOX2I& aRect )
 {
+    // Check if mirror view is active
+    if( IsMirrorViewActive() )
+    {
+        // Split screen rendering: render both original and mirror views
+        redrawRectWithMirrorView( aRect );
+    }
+    else
+    {
+        // Standard single view rendering
+        redrawRectStandard( aRect );
+    }
+}
+
+
+void VIEW::redrawRectStandard( const BOX2I& aRect )
+{
     for( VIEW_LAYER* l : m_orderedLayers )
     {
         if( l->visible && IsTargetDirty( l->target ) && areRequiredLayersEnabled( l->id ) )
@@ -1045,6 +1062,70 @@ void VIEW::redrawRect( const BOX2I& aRect )
 
                 l->items->Query( aRect, drawFunc );
             }
+        }
+    }
+}
+
+
+void VIEW::redrawRectWithMirrorView( const BOX2I& aRect )
+{
+    if( !m_mirrorViewInterface )
+        return;
+
+    // Get screen size for viewport calculations
+    VECTOR2D screenSize = m_gal->GetScreenPixelSize();
+    BOX2D fullViewport( VECTOR2D( 0, 0 ), screenSize );
+    
+    // Calculate board center for mirroring (simplified - use view center)
+    VECTOR2D boardCenter = GetCenter();
+    
+    // Get viewports for both views
+    BOX2D originalViewport = m_mirrorViewInterface->GetOriginalViewport( fullViewport );
+    BOX2D mirrorViewport = m_mirrorViewInterface->GetMirrorViewport( fullViewport );
+    
+    for( VIEW_LAYER* l : m_orderedLayers )
+    {
+        if( l->visible && IsTargetDirty( l->target ) && areRequiredLayersEnabled( l->id ) )
+        {
+            m_gal->SetTarget( l->target );
+            m_gal->SetLayerDepth( l->renderingOrder );
+
+            // Differential layer setup
+            if( l->diffLayer )
+                m_gal->StartDiffLayer();
+            else if( l->hasNegatives )
+                m_gal->StartNegativesLayer();
+
+            // For now, render both views without viewport clipping
+            // TODO: Implement proper viewport clipping when GAL supports it
+            
+            // Render mirror view (left side) with transformation
+            m_mirrorViewInterface->SetupMirrorTransform( m_gal, boardCenter );
+            
+            DRAW_ITEM_VISITOR drawFuncMirror( this, l->id, m_useDrawPriority, m_reverseDrawOrder );
+            l->items->Query( aRect, drawFuncMirror );
+            
+            if( m_useDrawPriority )
+                drawFuncMirror.deferredDraw();
+            
+            // Restore transformation
+            m_mirrorViewInterface->RestoreTransform( m_gal );
+            
+            // Render original view (right side) normally
+            DRAW_ITEM_VISITOR drawFuncOriginal( this, l->id, m_useDrawPriority, m_reverseDrawOrder );
+            l->items->Query( aRect, drawFuncOriginal );
+            
+            if( m_useDrawPriority )
+                drawFuncOriginal.deferredDraw();
+
+            // Handle differential layers
+            if( l->diffLayer )
+                m_gal->EndDiffLayer();
+            else if( l->hasNegatives )
+                m_gal->EndNegativesLayer();
+
+            // Handle forced transparent items (simplified for now)
+            // TODO: This needs to be handled for both viewports separately
         }
     }
 }
@@ -1743,6 +1824,43 @@ void VIEW::AddToPreview( VIEW_ITEM* aItem, bool aTakeOwnership )
 void VIEW::ShowPreview( bool aShow )
 {
    SetVisible( m_preview.get(), aShow );
+}
+
+
+void VIEW::SetMirrorViewInterface( MIRROR_VIEW_INTERFACE* aMirrorInterface )
+{
+    printf("DEBUG: SetMirrorViewInterface() called with interface: %p\n", aMirrorInterface);
+    m_mirrorViewInterface = aMirrorInterface;
+    
+    if( m_mirrorViewInterface && m_gal )
+    {
+        // Update screen size in mirror view interface
+        VECTOR2D screenSize = m_gal->GetScreenPixelSize();
+        m_mirrorViewInterface->SetScreenSize( screenSize );
+        printf("DEBUG: SetMirrorViewInterface() - interface set and screen size configured\n");
+    }
+    else
+    {
+        printf("DEBUG: SetMirrorViewInterface() - interface: %p, gal: %p\n", m_mirrorViewInterface, m_gal);
+    }
+    
+    // Force redraw when mirror view state changes
+    MarkDirty();
+}
+
+
+bool VIEW::IsMirrorViewActive() const
+{
+    bool hasInterface = (m_mirrorViewInterface != nullptr);
+    bool isEnabled = hasInterface ? m_mirrorViewInterface->IsMirrorViewEnabled() : false;
+    
+    // Debug output
+    printf("DEBUG: IsMirrorViewActive() - hasInterface: %s, isEnabled: %s, result: %s\n",
+           hasInterface ? "true" : "false",
+           isEnabled ? "true" : "false", 
+           (hasInterface && isEnabled) ? "true" : "false");
+    
+    return hasInterface && isEnabled;
 }
 
 

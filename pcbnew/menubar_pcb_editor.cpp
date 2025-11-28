@@ -276,6 +276,7 @@ void PCB_EDIT_FRAME::doReCreateMenuBar()
     viewMenu->Add( contrastModeSubMenu );
 
     viewMenu->Add( PCB_ACTIONS::flipBoard,                  ACTION_MENU::CHECK );
+    viewMenu->Add( PCB_ACTIONS::toggleMirrorView,          ACTION_MENU::CHECK );
 
 #ifdef __APPLE__
     viewMenu->AppendSeparator();
