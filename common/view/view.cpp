@@ -1829,6 +1829,7 @@ void VIEW::ShowPreview( bool aShow )
 
 void VIEW::SetMirrorViewInterface( MIRROR_VIEW_INTERFACE* aMirrorInterface )
 {
+    printf("DEBUG: SetMirrorViewInterface() called with interface: %p\n", aMirrorInterface);
     m_mirrorViewInterface = aMirrorInterface;
     
     if( m_mirrorViewInterface && m_gal )
@@ -1836,6 +1837,11 @@ void VIEW::SetMirrorViewInterface( MIRROR_VIEW_INTERFACE* aMirrorInterface )
         // Update screen size in mirror view interface
         VECTOR2D screenSize = m_gal->GetScreenPixelSize();
         m_mirrorViewInterface->SetScreenSize( screenSize );
+        printf("DEBUG: SetMirrorViewInterface() - interface set and screen size configured\n");
+    }
+    else
+    {
+        printf("DEBUG: SetMirrorViewInterface() - interface: %p, gal: %p\n", m_mirrorViewInterface, m_gal);
     }
     
     // Force redraw when mirror view state changes
@@ -1845,7 +1851,16 @@ void VIEW::SetMirrorViewInterface( MIRROR_VIEW_INTERFACE* aMirrorInterface )
 
 bool VIEW::IsMirrorViewActive() const
 {
-    return m_mirrorViewInterface && m_mirrorViewInterface->IsMirrorViewEnabled();
+    bool hasInterface = (m_mirrorViewInterface != nullptr);
+    bool isEnabled = hasInterface ? m_mirrorViewInterface->IsMirrorViewEnabled() : false;
+    
+    // Debug output
+    printf("DEBUG: IsMirrorViewActive() - hasInterface: %s, isEnabled: %s, result: %s\n",
+           hasInterface ? "true" : "false",
+           isEnabled ? "true" : "false", 
+           (hasInterface && isEnabled) ? "true" : "false");
+    
+    return hasInterface && isEnabled;
 }
 
 

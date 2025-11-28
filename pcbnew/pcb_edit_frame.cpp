@@ -1006,9 +1006,39 @@ void PCB_EDIT_FRAME::setupUIConditions()
             };
 
     auto boardFlippedCond =
+
+    auto mirrorViewCond =
             [this]( const SELECTION& )
             {
+                return IsMirrorViewEnabled();
+            };
+            [this]( const SELECTION& )
+
+    auto mirrorViewCond =
+            [this]( const SELECTION& )
+            {
+                return IsMirrorViewEnabled();
+            };
+            {
+
+    auto mirrorViewCond =
+            [this]( const SELECTION& )
+            {
+                return IsMirrorViewEnabled();
+            };
                 return GetCanvas() && GetCanvas()->GetView()->IsMirroredX();
+
+    auto mirrorViewCond =
+            [this]( const SELECTION& )
+            {
+                return IsMirrorViewEnabled();
+            };
+            };
+
+    auto mirrorViewCond =
+            [this]( const SELECTION& )
+            {
+                return IsMirrorViewEnabled();
             };
 
     auto layerManagerCond =
@@ -1075,6 +1105,7 @@ void PCB_EDIT_FRAME::setupUIConditions()
 
     mgr->SetConditions( ACTIONS::highContrastMode,         CHECK( highContrastCond ) );
     mgr->SetConditions( PCB_ACTIONS::flipBoard,            CHECK( boardFlippedCond ) );
+    mgr->SetConditions( PCB_ACTIONS::toggleMirrorView,     CHECK( mirrorViewCond ) );
     mgr->SetConditions( PCB_ACTIONS::showLayersManager,    CHECK( layerManagerCond ) );
     mgr->SetConditions( PCB_ACTIONS::showRatsnest,         CHECK( globalRatsnestCond ) );
     mgr->SetConditions( PCB_ACTIONS::ratsnestLineMode,     CHECK( curvedRatsnestCond ) );
@@ -3264,16 +3295,25 @@ bool PCB_EDIT_FRAME::DoAutoSave()
 
 void PCB_EDIT_FRAME::ToggleMirrorView()
 {
+    printf("DEBUG: ToggleMirrorView() called\n");
     if( m_mirrorViewManager )
     {
         bool currentState = m_mirrorViewManager->IsMirrorViewEnabled();
+        printf("DEBUG: ToggleMirrorView() - current state: %s, setting to: %s\n",
+               currentState ? "true" : "false", 
+               !currentState ? "true" : "false");
         m_mirrorViewManager->SetMirrorViewEnabled( !currentState );
         
         // Force a refresh of the view
         if( GetCanvas() )
         {
             GetCanvas()->Refresh();
+            printf("DEBUG: ToggleMirrorView() - canvas refreshed\n");
         }
+    }
+    else
+    {
+        printf("DEBUG: ToggleMirrorView() - m_mirrorViewManager is null!\n");
     }
 }
 

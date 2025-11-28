@@ -387,6 +387,7 @@ public:
     static TOOL_ACTION layerChanged;        // notification
 
     static TOOL_ACTION flipBoard;
+    static TOOL_ACTION toggleMirrorView;
 
     static TOOL_ACTION rehatchShapes;
 

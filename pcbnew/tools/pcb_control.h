@@ -118,6 +118,7 @@ public:
     int CollectAndEmbed3DModels( const TOOL_EVENT& aEvent );
 
     int FlipPcbView( const TOOL_EVENT& aEvent );
+    int ToggleMirrorView( const TOOL_EVENT& aEvent );
 
     int RehatchShapes( const TOOL_EVENT& aEvent );
 
